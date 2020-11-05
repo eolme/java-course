@@ -117,3 +117,5 @@ Main-Class: FirstClass
 5. Правила статического импорта
 6. Состав класса в java
 7. Метод main()
+
+[← Вернуться на главную](https://eolme.github.io/java-course/)

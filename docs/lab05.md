@@ -82,3 +82,5 @@ public class <Интерфейс>Synchronizer {
 11. Поля volatile
 12. Методы класса Object для синхронизации потоков
 13. Правила прерывания потоков, запрещенные метод
+
+[← Вернуться на главную](https://eolme.github.io/java-course/)

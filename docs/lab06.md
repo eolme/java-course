@@ -35,3 +35,5 @@
 9. Структурный паттерн Proxy
 10. Образец поведения Iterator
 11. Образец поведения Observer
+
+[← Вернуться на главную](https://eolme.github.io/java-course/)
