@@ -11,9 +11,6 @@ class Game {
 
   private int min = 0;
   private int max = 0;
-
-  private int minCurrent = 0;
-  private int maxCurrent = 0;
   private int current = 0;
 
   public int getCurrent() {
