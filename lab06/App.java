@@ -168,18 +168,6 @@ public class App {
     System.out.println("Processed");
   }
 
-  private static PaperCollection getNew(PaperCollection as) {
-    if (as instanceof StoryCollection) {
-      PaperCollectionManipulation.setFactory(new StoryCollectionFactory());
-      return PaperCollectionManipulation.createInstance();
-    } else if (as instanceof PoetryCollection) {
-      PaperCollectionManipulation.setFactory(new PoetryCollectionFactory());
-      return PaperCollectionManipulation.createInstance();
-    } else {
-      throw new RuntimeException("Not implemented");
-    }
-  }
-
   private static void test() throws IOException, ClassNotFoundException {
     if (collections.isEmpty()) {
       throw new RuntimeException("Collection is empty");
@@ -198,20 +186,18 @@ public class App {
 
     // test read/write
     System.out.println("read/write");
-    toInst = getNew(fromInst);
     writer = new CharArrayWriter();
     PaperCollectionManipulation.write(fromInst, writer);
     reader = new CharArrayReader(((CharArrayWriter) writer).toCharArray());
-    PaperCollectionManipulation.read(reader, toInst);
+    toInst = PaperCollectionManipulation.read(reader);
     System.out.println(fromInst.equals(toInst));
 
     // test input/output
     System.out.println("input/output");
-    toInst = getNew(fromInst);
     outputStream = new ByteArrayOutputStream();
     PaperCollectionManipulation.output(fromInst, outputStream);
     inputStream = new ByteArrayInputStream(((ByteArrayOutputStream) outputStream).toByteArray());
-    PaperCollectionManipulation.input(inputStream, toInst);
+    toInst = PaperCollectionManipulation.input(inputStream);
     System.out.println(fromInst.equals(toInst));
 
     // test serialize/deserialize

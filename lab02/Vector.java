@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Vector {
   private double[] arr;
 
@@ -7,6 +9,10 @@ public class Vector {
 
   public double get(int index) {
     return arr[index];
+  }
+
+  public void set(int index, double value) {
+    arr[index] = value;
   }
 
   public int getLength() {
@@ -73,5 +79,10 @@ public class Vector {
     for (var i = 0; i < arr.length; ++i) {
       arr[i] *= v.get(i);
     }
+  }
+
+  @Override
+  public String toString() {
+    return Arrays.toString(arr);
   }
 }

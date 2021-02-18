@@ -135,6 +135,8 @@ public class App {
         map.put(key, list);
       }
     }
+    System.out.println("map");
+    System.out.println(map);
 
     var storyCollections = new LinkedList<StoryCollection>();
     var poetryCollections = new LinkedList<PoetryCollection>();
@@ -149,6 +151,10 @@ public class App {
         continue;
       }
     }
+    System.out.println("story");
+    System.out.println(storyCollections);
+    System.out.println("poetry");
+    System.out.println(poetryCollections);
 
     System.out.println("Processed");
   }

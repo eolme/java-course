@@ -1,7 +1,3 @@
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -43,25 +39,5 @@ public class UnmodifiablePaperCollection implements PaperCollection {
   @Override
   public double averagePaperLength() {
     return collection.averagePaperLength();
-  }
-
-  @Override
-  public void input(InputStream in) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void output(OutputStream out) {
-    collection.output(out);
-  }
-
-  @Override
-  public void read(Reader in) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void write(Writer out) {
-    collection.write(out);
   }
 }
