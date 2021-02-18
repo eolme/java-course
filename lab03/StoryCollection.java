@@ -79,8 +79,9 @@ public class StoryCollection implements PaperCollection {
     result.append("Revision: " + revision + NL);
     result.append("Stories: [" + NL);
     for (String p : stories) {
+      result.append('"');
       result.append(p);
-      result.append(NL);
+      result.append('"');
     }
     result.append("]" + NL);
     result.append("}");

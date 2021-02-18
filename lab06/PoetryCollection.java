@@ -7,40 +7,42 @@ import java.io.Serial;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class StoryCollection implements PaperCollection {
-  private static final long serialVersionUID = 3234407779241329483L;
+public class PoetryCollection implements PaperCollection {
+  private static final long serialVersionUID = 7227182806651695679L;
 
   private String name;
 
   private int revision;
 
   @Serial
-  private List<String> stories;
+  private List<String> poetries;
 
-  public StoryCollection() {
-    name = "StoryCollection";
+  public PoetryCollection() {
+    name = "PoetryCollection";
     revision = 0;
-    stories = new ArrayList<String>(0);
+    poetries = new ArrayList<String>(0);
   }
 
-  public StoryCollection(String name, int revision, List<String> stories)
-      throws StoryCollection.StoryCollectionException {
+  public PoetryCollection(String name, int revision, List<String> poetries)
+      throws PoetryCollection.PoetryCollectionException {
 
     if (Objects.isNull(name)) {
-      throw new StoryCollectionException("Name is null");
+      throw new PoetryCollectionException("Name is null");
     }
 
-    if (Objects.isNull(stories)) {
-      throw new StoryCollectionException("stories is null");
+    if (Objects.isNull(poetries)) {
+      throw new PoetryCollectionException("Poetries is null");
     }
 
     this.name = name;
     this.revision = revision;
-    this.stories = stories;
+    this.poetries = poetries;
   }
 
   @Override
@@ -55,20 +57,7 @@ public class StoryCollection implements PaperCollection {
 
   @Override
   public List<String> getList() {
-    return stories;
-  }
-
-  @Override
-  public double averagePaperLength() {
-    if (stories.size() == 0) {
-      throw new StoryCollectionRuntimeException("Collection has no stories");
-    }
-
-    int total = 0;
-    for (String p : stories) {
-      total += p.length();
-    }
-    return total / ((double) stories.size());
+    return poetries;
   }
 
   @Override
@@ -109,7 +98,7 @@ public class StoryCollection implements PaperCollection {
         list.add(arr.toString());
       }
 
-      stories = list;
+      poetries = list;
     } catch (Exception exc) {
       throw new RuntimeException(exc);
     }
@@ -122,8 +111,8 @@ public class StoryCollection implements PaperCollection {
       out.write('\0');
       out.write(ByteBuffer.allocate(4).putInt(revision).array());
       out.write('\0');
-      for (String story : stories) {
-        out.write(story.getBytes());
+      for (String poetry : poetries) {
+        out.write(poetry.getBytes());
         out.write('\0');
       }
     } catch (Exception exc) {
@@ -165,16 +154,16 @@ public class StoryCollection implements PaperCollection {
         if (tmp != ' ') {
           arr.append((char) tmp);
         } else {
-          list.add(arr.toString());
+          list.push(arr.toString());
           arr.setLength(0);
         }
       }
 
       if (arr.length() != 0) {
-        list.add(arr.toString());
+        list.push(arr.toString());
       }
 
-      stories = list;
+      poetries = list;
     } catch (Exception exc) {
       throw new RuntimeException(exc);
     }
@@ -186,9 +175,9 @@ public class StoryCollection implements PaperCollection {
       out.append(name);
       out.append(' ');
       out.append(String.valueOf(revision));
-      for (String story : stories) {
+      for (String poetry : poetries) {
         out.append(' ');
-        out.append(story);
+        out.append(poetry);
       }
     } catch (Exception exc) {
       throw new RuntimeException(exc);
@@ -196,13 +185,26 @@ public class StoryCollection implements PaperCollection {
   }
 
   @Override
+  public double averagePaperLength() {
+    if (poetries.size() == 0) {
+      throw new PoetryCollectionRuntimeException("Collection has no poetries");
+    }
+
+    int total = 0;
+    for (String p : poetries) {
+      total += p.length();
+    }
+    return total / ((double) poetries.size());
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    return Objects.nonNull(obj) && obj instanceof StoryCollection && obj.hashCode() == hashCode();
+    return Objects.nonNull(obj) && obj instanceof PoetryCollection && obj.hashCode() == hashCode();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, revision, stories);
+    return Objects.hash(name, revision, poetries);
   }
 
   @Override
@@ -213,8 +215,8 @@ public class StoryCollection implements PaperCollection {
     result.append(this.getClass().getName() + " Object {" + NL);
     result.append("Name: " + name + NL);
     result.append("Revision: " + revision + NL);
-    result.append("Stories: [" + NL);
-    for (String p : stories) {
+    result.append("Poetries: [" + NL);
+    for (String p : poetries) {
       result.append('"');
       result.append(p);
       result.append('"');
@@ -226,19 +228,57 @@ public class StoryCollection implements PaperCollection {
     return result.toString();
   }
 
-  public class StoryCollectionException extends Exception {
+  public class PoetryCollectionException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    public StoryCollectionException(String message) {
+    public PoetryCollectionException(String message) {
       super(message);
     }
   }
 
-  public class StoryCollectionRuntimeException extends RuntimeException {
+  public class PoetryCollectionRuntimeException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public StoryCollectionRuntimeException(String message) {
+    public PoetryCollectionRuntimeException(String message) {
       super(message);
+    }
+  }
+
+  @Override
+  public Iterator<String> iterator() {
+    return new Itr();
+  }
+
+  private class Itr implements Iterator<String> {
+    int cursor;
+    int lastRet = -1;
+
+    Itr() {
+    }
+
+    @Override
+    public boolean hasNext() {
+      return cursor != PoetryCollection.this.poetries.size();
+    }
+
+    @Override
+    public String next() {
+      int i = cursor;
+      if (i >= PoetryCollection.this.poetries.size()) {
+        throw new NoSuchElementException();
+      }
+      cursor = i + 1;
+      return PoetryCollection.this.poetries.get(lastRet = i);
+    }
+
+    @Override
+    public void remove() {
+      if (lastRet < 0) {
+        throw new IllegalStateException();
+      }
+      PoetryCollection.this.poetries.remove(lastRet);
+      cursor = lastRet;
+      lastRet = -1;
     }
   }
 }

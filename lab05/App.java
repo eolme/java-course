@@ -1,3 +1,12 @@
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.io.Reader;
+import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +18,7 @@ public class App {
 
   private static String EXIT = "exit";
 
-  private static String MAIN_MENU = "1=AppendStoryCollection 2=AppendPoetryCollection 3=Process 0=Exit";
+  private static String MAIN_MENU = "1=AppendStoryCollection 2=AppendPoetryCollection 3=Process 4=Test 0=Exit";
 
   private static void menu() {
     char ch;
@@ -29,6 +38,10 @@ public class App {
           }
           case '3': {
             process();
+            break;
+          }
+          case '4': {
+            test();
             break;
           }
           case '0': {
@@ -151,6 +164,61 @@ public class App {
     }
 
     System.out.println("Processed");
+  }
+
+  private static PaperCollection getNew(PaperCollection as) {
+    if (as instanceof StoryCollection) {
+      return new StoryCollection();
+    } else if (as instanceof PoetryCollection) {
+      return new PoetryCollection();
+    } else {
+      throw new RuntimeException("Not implemented");
+    }
+  }
+
+  private static void test() throws IOException, ClassNotFoundException {
+    if (collections.isEmpty()) {
+      throw new RuntimeException("Collection is empty");
+    }
+
+    PaperCollection fromInst;
+    PaperCollection toInst;
+
+    OutputStream outputStream;
+    InputStream inputStream;
+
+    Writer writer;
+    Reader reader;
+
+    fromInst = collections.get(0);
+
+    // test read/write
+    System.out.println("read/write");
+    toInst = getNew(fromInst);
+    writer = new CharArrayWriter();
+    PaperCollectionManipulation.write(fromInst, writer);
+    reader = new CharArrayReader(((CharArrayWriter) writer).toCharArray());
+    PaperCollectionManipulation.read(reader, toInst);
+    System.out.println(fromInst.equals(toInst));
+
+    // test input/output
+    System.out.println("input/output");
+    toInst = getNew(fromInst);
+    outputStream = new ByteArrayOutputStream();
+    PaperCollectionManipulation.output(fromInst, outputStream);
+    inputStream = new ByteArrayInputStream(((ByteArrayOutputStream) outputStream).toByteArray());
+    PaperCollectionManipulation.input(inputStream, toInst);
+    System.out.println(fromInst.equals(toInst));
+
+    // test serialize/deserialize
+    outputStream = new ByteArrayOutputStream();
+    PaperCollectionManipulation.serialize(fromInst, outputStream);
+    inputStream = new ByteArrayInputStream(((ByteArrayOutputStream) outputStream).toByteArray());
+    toInst = PaperCollectionManipulation.deserialize(inputStream);
+    System.out.println("serialize/deserialize");
+    System.out.println(fromInst.equals(toInst));
+
+    System.out.println("Tested");
   }
 
   public static void main(String[] args) {

@@ -7,8 +7,10 @@ import java.io.Serial;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class StoryCollection implements PaperCollection {
@@ -239,6 +241,44 @@ public class StoryCollection implements PaperCollection {
 
     public StoryCollectionRuntimeException(String message) {
       super(message);
+    }
+  }
+
+  @Override
+  public Iterator<String> iterator() {
+    return new Itr();
+  }
+
+  private class Itr implements Iterator<String> {
+    int cursor;
+    int lastRet = -1;
+
+    Itr() {
+    }
+
+    @Override
+    public boolean hasNext() {
+      return cursor != StoryCollection.this.stories.size();
+    }
+
+    @Override
+    public String next() {
+      int i = cursor;
+      if (i >= StoryCollection.this.stories.size()) {
+        throw new NoSuchElementException();
+      }
+      cursor = i + 1;
+      return StoryCollection.this.stories.get(lastRet = i);
+    }
+
+    @Override
+    public void remove() {
+      if (lastRet < 0) {
+        throw new IllegalStateException();
+      }
+      StoryCollection.this.stories.remove(lastRet);
+      cursor = lastRet;
+      lastRet = -1;
     }
   }
 }

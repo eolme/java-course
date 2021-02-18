@@ -4,8 +4,9 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.List;
+import java.lang.Iterable;
 
-public interface PaperCollection extends Serializable {
+public interface PaperCollection extends Serializable, Iterable<String> {
   public String getName();
 
   public int getRevision();

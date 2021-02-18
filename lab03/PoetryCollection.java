@@ -79,7 +79,9 @@ public class PoetryCollection implements PaperCollection {
     result.append("Revision: " + revision + NL);
     result.append("Poetries: [" + NL);
     for (String p : poetries) {
+      result.append('"');
       result.append(p);
+      result.append('"');
       result.append(NL);
     }
     result.append("]" + NL);
