@@ -36,6 +36,11 @@ public class UnmodifiablePaperCollection implements PaperCollection {
   }
 
   @Override
+  public String getItem(int index) {
+    return collection.getItem(index);
+  }
+
+  @Override
   public double averagePaperLength() {
     return collection.averagePaperLength();
   }

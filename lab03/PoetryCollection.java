@@ -47,6 +47,11 @@ public class PoetryCollection implements PaperCollection {
   }
 
   @Override
+  public String getItem(int index) {
+    return poetries.get(index);
+  }
+
+  @Override
   public double averagePaperLength() {
     if (poetries.size() == 0) {
       throw new PoetryCollectionRuntimeException("Collection has no poetries");

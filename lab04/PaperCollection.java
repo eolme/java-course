@@ -12,6 +12,8 @@ public interface PaperCollection extends Serializable {
 
   public List<String> getList();
 
+  public String getItem(int index);
+
   public double averagePaperLength();
 
   public void input(InputStream in);

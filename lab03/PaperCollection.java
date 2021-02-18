@@ -7,5 +7,7 @@ public interface PaperCollection {
 
   public List<String> getList();
 
+  public String getItem(int index);
+
   public double averagePaperLength();
 }

@@ -59,6 +59,11 @@ public class StoryCollection implements PaperCollection {
   }
 
   @Override
+  public String getItem(int index) {
+    return stories.get(index);
+  }
+
+  @Override
   public double averagePaperLength() {
     if (stories.size() == 0) {
       throw new StoryCollectionRuntimeException("Collection has no stories");

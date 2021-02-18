@@ -59,6 +59,11 @@ public class PoetryCollection implements PaperCollection {
   }
 
   @Override
+  public String getItem(int index) {
+    return poetries.get(index);
+  }
+
+  @Override
   public void input(InputStream in) {
     try {
       var arr = new ByteArrayOutputStream();
