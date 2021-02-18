@@ -1,24 +1,9 @@
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.io.Reader;
-import java.io.OutputStream;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 public class App {
   private static Scanner in = new Scanner(System.in);
-  private static LinkedList<PaperCollection> collections = new LinkedList<PaperCollection>();
 
-  private static String EXIT = "exit";
-
-  private static String MAIN_MENU = "1=AppendStoryCollection 2=AppendPoetryCollection 3=Process 4=Test 0=Exit";
+  private static String MAIN_MENU = "1=Process1 2=Process2 3=Process3 0=Exit";
 
   private static void menu() {
     char ch;
@@ -29,19 +14,15 @@ public class App {
 
         switch (ch) {
           case '1': {
-            appendStoryCollection();
+            process1();
             break;
           }
           case '2': {
-            appendPoetryCollection();
+            process2();
             break;
           }
           case '3': {
-            process();
-            break;
-          }
-          case '4': {
-            test();
+            process3();
             break;
           }
           case '0': {
@@ -58,167 +39,56 @@ public class App {
     } while (ch != '0');
   }
 
-  private static String APPEND_STORY_COLLECTION = "Name Revision Story line by line | type 'exit'";
+  private static void process1() throws InterruptedException {
+    var shared = new StepPaperCollection();
+    var writer = new WriterPaperCollection(shared);
+    var reader = new ReaderPaperCollection(shared);
 
-  private static void appendStoryCollection() throws StoryCollection.StoryCollectionException {
-    System.out.println(APPEND_STORY_COLLECTION);
+    writer.setPriority(Thread.MAX_PRIORITY);
+    writer.start();
 
-    String name;
-    int revision;
-    List<String> stories = new LinkedList<String>();
-
-    String line = in.nextLine();
-
-    if (!EXIT.equals(line)) {
-      name = line;
-    } else {
-      System.out.println("Aborted");
-      return;
-    }
-
-    line = in.nextLine();
-    if (!EXIT.equals(line)) {
-      revision = Integer.parseInt(line);
-    } else {
-      System.out.println("Aborted");
-      return;
-    }
-
-    line = in.nextLine();
-    while (!EXIT.equals(line)) {
-      stories.add(line);
-      line = in.nextLine();
-    }
-
-    collections.add(new StoryCollection(name, revision, stories));
-    System.out.println("Added");
-    return;
+    reader.setPriority(Thread.MIN_PRIORITY);
+    reader.start();
   }
 
-  private static String APPEND_POETRY_COLLECTION = "Name Revision Poetry line by line | type 'exit'";
+  private static void process2() {
+    var shared = new StepPaperCollection();
+    var sync = new PaperCollectionSynchronizer(shared);
 
-  private static void appendPoetryCollection() throws PoetryCollection.PoetryCollectionException {
-    System.out.println(APPEND_POETRY_COLLECTION);
+    var writer = new SyncWriterPaperCollection(sync);
+    var reader = new SyncReaderPaperCollection(sync);
 
-    String name;
-    int revision;
-    List<String> poetries = new LinkedList<String>();
+    var writerThread = new Thread(writer);
+    var readerThread = new Thread(reader);
 
-    String line = in.nextLine();
-    if (!EXIT.equals(line)) {
-      name = line;
-    } else {
-      System.out.println("Aborted");
-      return;
-    }
-
-    line = in.nextLine();
-    if (!EXIT.equals(line)) {
-      revision = Integer.parseInt(line);
-    } else {
-      System.out.println("Aborted");
-      return;
-    }
-
-    line = in.nextLine();
-    while (!EXIT.equals(line)) {
-      poetries.add(line);
-      line = in.nextLine();
-    }
-
-    collections.add(new PoetryCollection(name, revision, poetries));
-    System.out.println("Added");
-    return;
+    writerThread.start();
+    readerThread.start();
   }
 
-  private static void process() {
-    for (PaperCollection col : collections) {
-      System.out.println(col);
-    }
+  private static void process3() {
+    var shared = new StepPaperCollection();
+    var sync = PaperCollectionManipulation.synchronizedPaperCollection(shared);
 
-    var map = new HashMap<Double, LinkedList<PaperCollection>>();
-    Double key;
-    for (PaperCollection col : collections) {
-      key = col.averagePaperLength();
-      if (map.containsKey(key)) {
-        map.get(key).add(col);
-      } else {
-        var list = new LinkedList<PaperCollection>();
-        list.add(col);
-        map.put(key, list);
-      }
-    }
+    var setOneThread = new Thread(() -> {
+      var arr = sync.getArray();
+      arr[0] = 1;
+      System.out.println("setOneThread");
+    });
 
-    var storyCollections = new LinkedList<StoryCollection>();
-    var poetryCollections = new LinkedList<PoetryCollection>();
-    for (PaperCollection col : collections) {
-      if (col instanceof StoryCollection) {
-        storyCollections.add((StoryCollection) col);
-        continue;
-      }
+    var setTwoThread = new Thread(() -> {
+      var arr = sync.getArray();
+      arr[0] = 2;
+      System.out.println("setTwoThread");
+    });
 
-      if (col instanceof PoetryCollection) {
-        poetryCollections.add((PoetryCollection) col);
-        continue;
-      }
-    }
+    var readThread = new Thread(() -> {
+      var arr = sync.getArray();
+      System.out.println("Read: " + arr[0]);
+    });
 
-    System.out.println("Processed");
-  }
-
-  private static PaperCollection getNew(PaperCollection as) {
-    if (as instanceof StoryCollection) {
-      return new StoryCollection();
-    } else if (as instanceof PoetryCollection) {
-      return new PoetryCollection();
-    } else {
-      throw new RuntimeException("Not implemented");
-    }
-  }
-
-  private static void test() throws IOException, ClassNotFoundException {
-    if (collections.isEmpty()) {
-      throw new RuntimeException("Collection is empty");
-    }
-
-    PaperCollection fromInst;
-    PaperCollection toInst;
-
-    OutputStream outputStream;
-    InputStream inputStream;
-
-    Writer writer;
-    Reader reader;
-
-    fromInst = collections.get(0);
-
-    // test read/write
-    System.out.println("read/write");
-    toInst = getNew(fromInst);
-    writer = new CharArrayWriter();
-    PaperCollectionManipulation.write(fromInst, writer);
-    reader = new CharArrayReader(((CharArrayWriter) writer).toCharArray());
-    PaperCollectionManipulation.read(reader, toInst);
-    System.out.println(fromInst.equals(toInst));
-
-    // test input/output
-    System.out.println("input/output");
-    toInst = getNew(fromInst);
-    outputStream = new ByteArrayOutputStream();
-    PaperCollectionManipulation.output(fromInst, outputStream);
-    inputStream = new ByteArrayInputStream(((ByteArrayOutputStream) outputStream).toByteArray());
-    PaperCollectionManipulation.input(inputStream, toInst);
-    System.out.println(fromInst.equals(toInst));
-
-    // test serialize/deserialize
-    outputStream = new ByteArrayOutputStream();
-    PaperCollectionManipulation.serialize(fromInst, outputStream);
-    inputStream = new ByteArrayInputStream(((ByteArrayOutputStream) outputStream).toByteArray());
-    toInst = PaperCollectionManipulation.deserialize(inputStream);
-    System.out.println("serialize/deserialize");
-    System.out.println(fromInst.equals(toInst));
-
-    System.out.println("Tested");
+    setOneThread.start();
+    readThread.start();
+    setTwoThread.start();
   }
 
   public static void main(String[] args) {

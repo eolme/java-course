@@ -1,35 +1,5 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
-
 public class PaperCollectionManipulation {
-  public static void output(PaperCollection inst, OutputStream out) {
-    inst.output(out);
-  }
-
-  public static PaperCollection input(InputStream in, PaperCollection inst) {
-    inst.input(in);
-    return inst;
-  }
-
-  public static void write(PaperCollection inst, Writer out) {
-    inst.write(out);
-  }
-
-  public static PaperCollection read(Reader in, PaperCollection inst) {
-    inst.read(in);
-    return inst;
-  }
-
-  public static void serialize(PaperCollection o, OutputStream out) throws IOException {
-    new ObjectOutputStream(out).writeObject(o);
-  }
-
-  public static PaperCollection deserialize(InputStream in) throws IOException, ClassNotFoundException {
-    return (PaperCollection) new ObjectInputStream(in).readObject();
+  public static PaperCollection synchronizedPaperCollection(PaperCollection collection) {
+    return new SynchronizedPaperCollection(collection);
   }
 }
